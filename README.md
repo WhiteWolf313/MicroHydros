@@ -9,7 +9,7 @@ Denna prototyp samlar in miljödata från en hydroponisk odlingsmiljö (temperat
         DS[DS18B20 Sensor<br>Vattentemp] -- 1-Wire --> ESP
     end
 
-    subgraph Moln [Adafruit IO Molntjänst]
+    subgraph Moln [Externt system / Adafruit IO]
         ESP -- MQTT Publish<br>över Wi-Fi --> Broker[MQTT Broker]
         Broker --> DB[(Databas för<br>historisk data)]
     end
