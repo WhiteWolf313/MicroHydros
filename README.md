@@ -3,20 +3,7 @@
 ## Projektets syfte
 Denna prototyp samlar in miljödata från en hydroponisk odlingsmiljö (temperatur och luftfuktighet) och skickar detta via MQTT till en molntjänst (Adafruit IO) för övervakning över tid. Projektet är utvecklat på uppdrag av HydroGreen Fingers AB.
 ## Arkitekturdiagrammet
- graph LR
-    subgraph Edge [Lokal Odlingsmiljö - MicroHydros]
-        SHT[SHT31 Sensor<br>Luft & Fukt] -- I2C --> ESP[ESP32 Mikrokontroller]
-        DS[DS18B20 Sensor<br>Vattentemp] -- 1-Wire --> ESP
-    end
-
-    subgraph Moln [Externt system / Adafruit IO]
-        ESP -- MQTT Publish<br>över Wi-Fi --> Broker[MQTT Broker]
-        Broker --> DB[(Databas för<br>historisk data)]
-    end
-
-    subgraph Klient [Slutanvändare]
-        DB -. HTTPS / WebSockets .-> Dash[Webb-Dashboard<br>Grafer & Analys]
-    end
+ ![Arkitekturdiagrammet](docs/MicroHydro Sensor Data-2026-09-03-202518.png)
 
 ## Nödvändiga beroenden
 - **Hårdvara:** ESP32, SHT31 (I2C), DS18B20 (1-Wire), 4.7kΩ motstånd.
