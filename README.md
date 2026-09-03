@@ -3,7 +3,7 @@
 ## Projektets syfte
 Denna prototyp samlar in miljödata från en hydroponisk odlingsmiljö (temperatur och luftfuktighet) och skickar detta via MQTT till en molntjänst (Adafruit IO) för övervakning över tid. Projektet är utvecklat på uppdrag av HydroGreen Fingers AB.
 ## Arkitekturdiagrammet
-graph LR
+ graph LR
     subgraph Edge [Lokal Odlingsmiljö - MicroHydros]
         SHT[SHT31 Sensor<br>Luft & Fukt] -- I2C --> ESP[ESP32 Mikrokontroller]
         DS[DS18B20 Sensor<br>Vattentemp] -- 1-Wire --> ESP
