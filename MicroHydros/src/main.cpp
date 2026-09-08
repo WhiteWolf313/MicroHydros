@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "Sensors.h"
 #include "Cloud.h"
-
+#include "../include/config.h" // Inkludera våra hemligheter
 
 
 unsigned long lastMsgTime = 0;
@@ -14,7 +14,7 @@ void setup() {
 
     Serial.println("--- MicroHydros Startar ---");
     
-  
+    setupSensors();
     setupCloud();
 }
 
@@ -30,7 +30,13 @@ void loop() {
         
         Serial.println("\nLäser sensorer...");
         
-      
+        float airTemp = getAirTempIn();
+        float airHum = getAirHumidityIn();
+
+      // Skicka datan (funktionen publishData filtrerar bort orimliga värden)
+        
+        publishData(FEED_LUFT_INNE, airTemp);
+        publishData(FEED_FUKT_INNE, airHum);
         
         
     }
