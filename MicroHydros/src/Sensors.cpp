@@ -1,43 +1,83 @@
 #include "Sensors.h"
-#include "config.h"
 #include <Wire.h>
+#include <Adafruit_SHT31.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <SPI.h>
 
-bool Sensors::begin() {
-    Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, I2C_FREQ_HZ);
-    return reconnect();
+// Två separata I2C-bussar => båda sensorerna får behålla adress 0x44.
+// Ingen AD-pinne behöver kopplas om.
+#define PIN_SDA_INNE 8
+#define PIN_SCL_INNE 9
+#define PIN_SDA_UTE  10
+#define PIN_SCL_UTE  11
+
+#define SHT31_ADDR 0x44
+#define I2C_HASTIGHET 100000
+
+#define FEL_VARDE -999.0
+
+// VIKTIGT: TwoWire-pekaren skickas till KONSTRUKTORN, inte till begin().
+// Wire = buss 0, Wire1 = buss 1. Båda finns redan i ESP32-kärnan.
+Adafruit_SHT31 sht31_inne = Adafruit_SHT31(&Wire);
+Adafruit_SHT31 sht31_ute  = Adafruit_SHT31(&Wire1);
+
+static bool inneHittad = false;
+static bool uteHittad  = false;
+
+void setupSensors() {
+    // 1. Inne-bussen
+    Wire.begin(PIN_SDA_INNE, PIN_SCL_INNE, I2C_HASTIGHET);
+    inneHittad = sht31_inne.begin(SHT31_ADDR);
+    Serial.println(inneHittad ? "SHT31 INNE hittad (buss 0, GPIO 8/9)."
+                              : "Kunde inte hitta SHT31 - INNE!");
+
+    // 2. Ute-bussen
+    Wire1.begin(PIN_SDA_UTE, PIN_SCL_UTE, I2C_HASTIGHET);
+    uteHittad = sht31_ute.begin(SHT31_ADDR);
+    Serial.println(uteHittad ? "SHT31 UTE hittad (buss 1, GPIO 10/11)."
+                             : "Kunde inte hitta SHT31 - UTE!");
 }
 
-bool Sensors::reconnect() {
-    _ready = _sht31Outdoor.begin(SHT31_OUTDOOR_ADDR);
-    if (_ready) {
-        _sht31Outdoor.heater(SHT31_HEATER_ENABLED);
+// --- Inne ---
+float getAirTempIn() {
+    if (!inneHittad) return FEL_VARDE;
+
+    float temp = sht31_inne.readTemperature();
+    if (!isnan(temp) && temp > -20 && temp < 60) {
+        return temp;
     }
-    return _ready;
+    return FEL_VARDE;
 }
 
-OutdoorReading Sensors::readOutdoor() {
-    OutdoorReading reading;
+float getAirHumidityIn() {
+    if (!inneHittad) return FEL_VARDE;
 
-    if (!_ready) {
-        return reading;  // valid = false
+    float hum = sht31_inne.readHumidity();
+    if (!isnan(hum) && hum >= 0 && hum <= 100) {
+        return hum;
     }
+    return FEL_VARDE;
+}
 
-    const float t = _sht31Outdoor.readTemperature();
-    const float h = _sht31Outdoor.readHumidity();
+// --- Ute ---
+float getAirTempOut() {
+    if (!uteHittad) return FEL_VARDE;
 
-    // Biblioteket returnerar NAN vid CRC-fel eller uteblivet svar.
-    if (isnan(t) || isnan(h)) {
-        _ready = false;  // tvinga fram en reconnect i loop()
-        return reading;
+    float temp = sht31_ute.readTemperature();
+    // Utökat nedre intervall för vintertemperatur
+    if (!isnan(temp) && temp > -40 && temp < 60) {
+        return temp;
     }
+    return FEL_VARDE;
+}
 
-    // Enkel rimlighetskontroll mot databladets mätområde.
-    if (t < -40.0f || t > 125.0f || h < 0.0f || h > 100.0f) {
-        return reading;
+float getAirHumidityOut() {
+    if (!uteHittad) return FEL_VARDE;
+
+    float hum = sht31_ute.readHumidity();
+    if (!isnan(hum) && hum >= 0 && hum <= 100) {
+        return hum;
     }
-
-    reading.temperatureC = t;
-    reading.humidityPct  = h;
-    reading.valid        = true;
-    return reading;
+    return FEL_VARDE;
 }

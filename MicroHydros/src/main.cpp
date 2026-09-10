@@ -1,46 +1,47 @@
 #include <Arduino.h>
-#include "config.h"
 #include "Sensors.h"
+#include "Cloud.h"
+#include "../include/config.h" // Inkludera våra hemligheter
 
-static Sensors  sensors;
-static uint32_t lastReadMs = 0;
+unsigned long lastMsgTime = 0;
+const long interval = 10000; // Skicka data var 10:e sekund (10000 millisekunder)
 
 void setup() {
-    Serial.begin(SERIAL_BAUD);
-    delay(300);  // hinner USB-CDC på S3 komma upp
+    // Starta serieporten för att kunna läsa loggar i VS Code (monitor_speed i platformio.ini)
+    Serial.begin(115200);
+    delay(1000);
 
-    Serial.println();
-    Serial.println(F("MicroHydros - utetemperatur (SHT31-D)"));
+    Serial.println("--- MicroHydros Startar ---");
 
-    if (sensors.begin()) {
-        Serial.printf("SHT31-D hittad pa adress 0x%02X\n", SHT31_OUTDOOR_ADDR);
-    } else {
-        Serial.printf("FEL: ingen SHT31-D pa 0x%02X. Kolla SDA/SCL, 3V3, GND och AD-pinnen.\n",
-                      SHT31_OUTDOOR_ADDR);
-    }
+    setupSensors();
+    setupCloud();
 }
 
 void loop() {
-    const uint32_t now = millis();
+    // Håller MQTT-anslutningen vid liv och återansluter om den dör
+    maintainMQTT();
 
-    // Icke-blockerande intervall - inga delay() i loopen.
-    if (now - lastReadMs < SENSOR_READ_INTERVAL_MS) {
-        return;
+    unsigned long now = millis();
+
+    // Körs var 10:e sekund (istället för delay(), vilket kallas 'non-blocking')
+    if (now - lastMsgTime > interval) {
+        lastMsgTime = now;
+
+        Serial.println("\nLäser sensorer...");
+
+        // Inne
+        float airTempIn = getAirTempIn();
+        float airHumIn  = getAirHumidityIn();
+
+        // Ute
+        float airTempOut = getAirTempOut();
+       
+
+        // Skicka datan till molnet (publishData filtrerar bort orimliga värden)
+        publishData(FEED_LUFT_INNE, airTempIn);
+        publishData(FEED_FUKT_INNE, airHumIn);
+
+        publishData(FEED_LUFT_UTE, airTempOut);
+        
     }
-    lastReadMs = now;
-
-    if (!sensors.isReady()) {
-        Serial.println(F("Sensorn svarar inte - forsoker koppla upp igen..."));
-        sensors.reconnect();
-        return;
-    }
-
-    const OutdoorReading r = sensors.readOutdoor();
-
-    if (!r.valid) {
-        Serial.println(F("Lasfel fran SHT31-D (ute)."));
-        return;
-    }
-
-    Serial.printf("Ute: %.2f C | %.1f %%RH\n", r.temperatureC, r.humidityPct);
 }
