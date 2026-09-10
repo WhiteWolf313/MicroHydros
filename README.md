@@ -1,22 +1,66 @@
 # MicroHydros - Prototyp 1
 
 ## Projektets syfte
-Denna prototyp samlar in miljödata från en hydroponisk odlingsmiljö (temperatur och luftfuktighet) och skickar detta via MQTT till en molntjänst (Adafruit IO) för övervakning över tid. Projektet är utvecklat på uppdrag av HydroGreen Fingers AB.
-## Arkitekturdiagrammet
- ![Arkitekturdiagrammet](docs/arkitektur.png)
+
+Denna prototyp samlar in miljödata från en hydroponisk odlingsmiljö och skickar mätdata via MQTT till en extern tjänst (Adafruit IO) för övervakning och lagring över tid. Projektet är utvecklat på uppdrag av HydroGreen Fingers AB.
+
+Systemet mäter:
+- Temperatur inne
+- Temperatur ute
+- Luftfuktighet inne
+- Temperatur i vattnet
+
+## Arkitekturdiagram
+
+![Arkitekturdiagram](docs/arkitektur.png)
 
 ## Nödvändiga beroenden
-- **Hårdvara:** ESP32, SHT31 (I2C), DS18B20 (1-Wire), 4.7kΩ motstånd.
-- **Mjukvara:** MicroPython v1.19+, `umqtt.simple`, `sht31` (externt bibliotek).
-- **Moln:** Adafruit IO-konto med uppsatta feeds.
+
+### Hårdvara
+
+- ESP32-S3
+- 2 × SHT31-D
+- DS18B20
+- 4.7 kΩ motstånd
+
+### Mjukvara
+
+- C/C++
+- PlatformIO
+- ESP32-plattform
+- MQTT
+
+### Molntjänst
+
+- Adafruit IO-konto
+- MQTT
+- Feeds för mätdata
 
 ## Hur systemet byggs eller startas
-1. Flasha ESP32 med MicroPython.
-2. Klona detta repository: `git clone https://github.com/WhiteWolf313/MicroHydros.git`
-3. Öppna filen `src/config.py` och fyll i era WiFi- och Adafruit IO-uppgifter.
-4. Ladda upp innehållet i `src/`-mappen till mikrokontrollern (t.ex. via VS Code + Pymakr eller Thonny).
-5. Starta om enheten. Koden i `main.py` körs automatiskt.
+
+1. Klona repositoryt:
+   `git clone https://github.com/WhiteWolf313/MicroHydros.git`
+
+2. Öppna projektet i VS Code.
+
+3. Kontrollera att PlatformIO är installerat och att projektets beroenden är tillgängliga.
+
+4. Anslut ESP32-S3 till datorn.
+
+5. Bygg och ladda upp projektet med PlatformIO.
+
+6. Starta om ESP32-S3 och kontrollera att systemet startar och ansluter till Wi-Fi.
 
 ## Grundläggande användning
-När systemet är igång ansluter det automatiskt till WiFi och börjar publicera mätvärden var 10:e sekund till Adafruit IO. Datat kan visualiseras i den tillhörande Adafruit IO Dashboarden.
 
+När systemet är igång läser ESP32-S3 av sensorerna och samlar in temperatur och luftfuktighet. Mätdata behandlas och skickas via Wi-Fi och MQTT till Adafruit IO.
+
+Mätningarna sker återkommande och datan kan därefter visas och följas över tid via Adafruit IO Dashboard.
+
+## Projektstruktur
+
+- `src/` – projektets C/C++-kod
+- `include/` – konfigurationsfiler och headerfiler
+- `lib/` – bibliotek
+- `docs/` – projektets dokumentation, tester och arkitekturdiagram
+- `platformio.ini` – PlatformIO-konfiguration
