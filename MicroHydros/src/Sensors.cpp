@@ -7,8 +7,8 @@
 
 // Två separata I2C-bussar => båda sensorerna får behålla adress 0x44.
 // Ingen AD-pinne behöver kopplas om.
-#define PIN_SDA_INNE 8
-#define PIN_SCL_INNE 9
+#define PIN_SDA_INNE 4
+#define PIN_SCL_INNE 5
 #define PIN_SDA_UTE  10
 #define PIN_SCL_UTE  11
 
