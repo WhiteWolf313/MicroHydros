@@ -3,7 +3,7 @@
 
 // Wi-Fi
 #define WIFI_SSID "Vodafone-EBDF"
-#define WIFI_PASS "TLL86QcUHeeD6EcQ"
+#define WIFI_PASS "xxxxxxxxxxx"
 
 // Adafruit IO / MQTT
 #define MQTT_SERVER "io.adafruit.com"
