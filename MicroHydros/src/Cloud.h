@@ -5,5 +5,5 @@ void setupCloud();
 bool connectMQTT();
 void publishData(const char* feed, float value);
 void maintainMQTT();
-
+bool isMQTTConnected();
 #endif

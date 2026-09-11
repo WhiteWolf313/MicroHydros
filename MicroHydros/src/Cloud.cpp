@@ -75,3 +75,7 @@ void publishData(const char* feed, float value) {
         Serial.println(feed);
     }
 }
+//Funnktionen frågar om MQTT är konaktad
+bool isMQTTConnected() {
+    return mqttClient.connected();
+}
