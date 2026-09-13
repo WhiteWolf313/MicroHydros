@@ -1,47 +1,57 @@
 #include <Arduino.h>
 #include "Sensors.h"
 #include "Cloud.h"
-#include "../include/config.h" // Inkludera våra hemligheter
+#include "LocalServer.h"
+#include "Matning.h"
+#include "config.h"
 
-unsigned long lastMsgTime = 0;
-const long interval = 10000; // Skicka data var 10:e sekund (10000 millisekunder)
+static unsigned long sistaMatning = 0;
+static uint32_t seqRaknare = 0;
+
+// Laser alla fyra matpunkter och paketerar dem i en Matning.
+static Matning lasSensorer() {
+    Matning m;
+    m.seq        = ++seqRaknare;
+    m.epoch      = aktuellEpoch();
+    m.uptime_s   = millis() / 1000;
+    m.tempInne   = getAirTempIn();
+    m.fuktInne   = getAirHumidityIn();
+    m.tempUte    = getAirTempOut();
+    m.tempVatten = getWaterTemp();
+    return m;
+}
 
 void setup() {
-    // Starta serieporten för att kunna läsa loggar i VS Code (monitor_speed i platformio.ini)
     Serial.begin(115200);
     delay(1000);
 
-    Serial.println("--- MicroHydros Startar ---");
+    Serial.println("--- MicroHydros startar ---");
 
     setupSensors();
     setupCloud();
+    setupLocalServer();
 }
 
 void loop() {
-    // Håller MQTT-anslutningen vid liv och återansluter om den dör
-    maintainMQTT();
+    maintainNetwork();      // Wi-Fi: ateranslutning och accesspunkt vid avbrott
+    maintainMQTT();         // broker: ateranslutning utan att blockera loopen
+    handleLocalServer();    // lokal dashboard, fungerar aven helt utan internet
 
-    unsigned long now = millis();
+    unsigned long nu = millis();
+    if (nu - sistaMatning < MATINTERVALL_MS) return;
+    sistaMatning = nu;
 
-    // Körs var 10:e sekund (istället för delay(), vilket kallas 'non-blocking')
-    if (now - lastMsgTime > interval) {
-        lastMsgTime = now;
+    Matning m = lasSensorer();
 
-        Serial.println("\nLäser sensorer...");
+    // Den lokala vyn uppdateras ALLTID och forst. Den ar oberoende av
+    // internet och ar darfor systemets tillforlitliga vag ut for matdata.
+    serverNyMatning(m);
 
-        // Inne
-        float airTempIn = getAirTempIn();
-        float airHumIn  = getAirHumidityIn();
-
-        // Ute
-        float airTempOut = getAirTempOut();
-       
-
-        // Skicka datan till molnet (publishData filtrerar bort orimliga värden)
-        publishData(FEED_LUFT_INNE, airTempIn);
-        publishData(FEED_FUKT_INNE, airHumIn);
-
-        publishData(FEED_LUFT_UTE, airTempOut);
-        
+    // Molnet ar ett tillagg. Nar brokern inte gar att na hoppas den har
+    // matningen over - inget buffras och inget skickas i efterhand.
+    if (!publiceraMatning(m)) {
+        Serial.print("Ingen kontakt med brokern - matning ");
+        Serial.print(m.seq);
+        Serial.println(" visas bara i den lokala vyn.");
     }
 }

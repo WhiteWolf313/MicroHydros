@@ -1,0 +1,9 @@
+#ifndef CLOUD_H
+#define CLOUD_H
+
+void setupCloud();
+void connectMQTT();
+void publishData(const char* feed, float value);
+void maintainMQTT();
+
+#endif
