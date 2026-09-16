@@ -40,11 +40,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   main{max-width:860px;margin:0 auto}
 
   /* Statusremsan ar sidans viktigaste element: den svarar pa fragan
-<<<<<<< HEAD
-     "vart tar mina matvarden vagen just nu?" */
-=======
      "gar mina matvarden till molnet just nu, eller visas de bara har?" */
->>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
   .status{
     border:1px solid var(--linje);
     border-left:6px solid var(--vaxtljus);
@@ -57,11 +53,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     flex-wrap:wrap;
   }
   .status.direkt{border-left-color:#4fd39a}
-<<<<<<< HEAD
-  .status.buffrar{border-left-color:var(--varning)}
-=======
   .status.lokalt{border-left-color:var(--varning)}
->>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
   .status.borta{border-left-color:#e2585b}
   .status strong{font-size:1.15rem;font-weight:600}
   .status span{color:var(--dov);font-size:.92rem}
@@ -104,12 +96,8 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   dl.fakta dt{color:var(--dov)}
   dl.fakta dd{margin:2px 0 0;font-variant-numeric:tabular-nums}
 
-<<<<<<< HEAD
-  h2.rubrik{font-size:1rem;font-weight:600;margin:36px 0 10px}
-=======
   h2.rubrik{font-size:1rem;font-weight:600;margin:36px 0 4px}
   .rubriktext{color:var(--dov);font-size:.85rem;margin:0 0 12px}
->>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
   table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
   th{text-align:right;font-weight:500;color:var(--dov);padding:8px 10px;border-bottom:1px solid var(--linje)}
   th:first-child{text-align:left}
@@ -157,22 +145,14 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   <dl class="fakta">
     <div><dt>Nätverk</dt><dd id="f-natverk">–</dd></div>
     <div><dt>Adress</dt><dd id="f-ip">–</dd></div>
-<<<<<<< HEAD
-    <div><dt>Sparat lokalt</dt><dd id="f-buffert">–</dd></div>
-    <div><dt>Skickat till brokern</dt><dd id="f-skickat">–</dd></div>
-=======
     <div><dt>Skickat till molnet</dt><dd id="f-skickat">–</dd></div>
     <div><dt>Missade sändningar</dt><dd id="f-missade">–</dd></div>
->>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
     <div><dt>Igång sedan start</dt><dd id="f-uptime">–</dd></div>
     <div><dt>Mätning nummer</dt><dd id="f-seq">–</dd></div>
   </dl>
 
   <h2 class="rubrik">Senaste mätningarna</h2>
-<<<<<<< HEAD
-=======
   <p class="rubriktext" id="rubriktext">Finns bara i enheten och försvinner vid omstart.</p>
->>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
   <table>
     <thead>
       <tr><th>Tid</th><th>Inne °C</th><th>Inne %RH</th><th>Ute °C</th><th>Vatten °C</th></tr>
@@ -218,22 +198,6 @@ function visaStatus(d){
   const detalj = document.getElementById('statusDetalj');
   ruta.className = 'status';
 
-<<<<<<< HEAD
-  if(d.mqtt.ansluten && d.buffert.antal === 0){
-    ruta.classList.add('direkt');
-    text.textContent = 'Mätvärden skickas direkt till brokern';
-    detalj.textContent = d.mqtt.skickade+' mätningar skickade sedan start';
-  }else if(d.buffert.antal > 0 && d.mqtt.ansluten){
-    ruta.classList.add('buffrar');
-    text.textContent = 'Skickar sparade mätvärden i efterhand';
-    detalj.textContent = d.buffert.antal+' värden kvar att skicka';
-  }else{
-    ruta.classList.add('buffrar');
-    text.textContent = 'Ingen kontakt med brokern';
-    detalj.textContent = 'Mätningarna sparas i enheten, '+d.buffert.antal+' av '
-      + d.buffert.kapacitet+' platser använda'
-      + (d.buffert.tappat ? '. Bufferten är full, äldsta värdena skrivs över.' : '.');
-=======
   if(d.mqtt.ansluten){
     ruta.classList.add('direkt');
     text.textContent = 'Mätvärden skickas till molnet';
@@ -243,7 +207,6 @@ function visaStatus(d){
     text.textContent = 'Ingen kontakt med molnet';
     detalj.textContent = 'Mätningarna visas bara här så länge avbrottet varar. '
       + d.mqtt.ej_skickade+' mätningar har hoppats över.';
->>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
   }
 }
 
@@ -281,17 +244,11 @@ async function uppdatera(){
     document.getElementById('f-natverk').textContent = d.wifi.ap_lage
       ? 'Lokal accesspunkt' : (d.wifi.ansluten ? 'Anslutet ('+d.wifi.rssi+' dBm)' : 'Söker nätverk');
     document.getElementById('f-ip').textContent = d.wifi.ip;
-<<<<<<< HEAD
-    document.getElementById('f-buffert').textContent = d.buffert.antal+' av '+d.buffert.kapacitet;
-    document.getElementById('f-skickat').textContent = d.mqtt.skickade;
-    document.getElementById('f-uptime').textContent = uptime(d.uptime_s);
-=======
     document.getElementById('f-skickat').textContent = d.mqtt.skickade;
     document.getElementById('f-missade').textContent = d.mqtt.ej_skickade;
     document.getElementById('f-uptime').textContent = uptime(d.uptime_s);
     document.getElementById('rubriktext').textContent =
       'De '+d.lokal_historik.kapacitet+' senaste mätningarna, sparade i enheten. Försvinner vid omstart.';
->>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
     visaHistorik(d.historik || []);
   }catch(e){
     const ruta = document.getElementById('status');
@@ -309,8 +266,4 @@ setInterval(uppdatera, 5000);
 </html>
 )rawliteral";
 
-<<<<<<< HEAD
 #endif
-=======
-#endif
->>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
