@@ -5,14 +5,14 @@
 #include <DallasTemperature.h>
 
 // Definiera pinnar
-#define ONE_WIRE_BUS 7 // Pin 4 for DS18B20
+#define ONE_WIRE_BUS 4 // Pin 4 for DS18B20
 
 // Tva separata I2C-bussar => bada sensorerna far behalla adress 0x44.
 // Ingen AD-pinne behover kopplas om.
-#define PIN_SDA_INNE 4
-#define PIN_SCL_INNE 5
-#define PIN_SDA_UTE  10
-#define PIN_SCL_UTE  11
+#define PIN_SDA_INNE 21
+#define PIN_SCL_INNE 22
+#define PIN_SDA_UTE  32
+#define PIN_SCL_UTE  33
 
 #define SHT31_ADDR 0x44
 #define I2C_HASTIGHET 100000
