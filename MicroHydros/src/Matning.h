@@ -8,7 +8,11 @@
 #define FEL_VARDE -999.0f
 
 // Ett komplett matvarde fran ett matningstillfalle.
+<<<<<<< HEAD
 // Samma struct anvands av sensorlasning, buffert, MQTT-publicering och dashboard
+=======
+// Samma struct anvands av sensorlasning, MQTT-publicering och dashboard
+>>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
 // sa att det bara finns EN representation av matdata i systemet.
 struct Matning {
     uint32_t seq;        // lopnummer, gor det mojligt att upptacka tappade varden
@@ -24,4 +28,8 @@ inline bool arGiltigt(float v) {
     return !isnan(v) && v != FEL_VARDE;
 }
 
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961

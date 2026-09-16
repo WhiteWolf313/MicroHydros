@@ -1,5 +1,8 @@
 #include "LocalServer.h"
+<<<<<<< HEAD
 #include "Buffer.h"
+=======
+>>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
 #include "Cloud.h"
 #include "web_page.h"
 #include <WiFi.h>
@@ -12,8 +15,19 @@
 // anslutna samtidigt och koden blir lattare att folja for en ny utvecklare.
 static WebServer server(80);
 
+<<<<<<< HEAD
 static Matning senaste;
 static bool harMatning = false;
+=======
+// Visningshistorik i RAM. Ringbuffert: nar den ar full skrivs det aldsta
+// vardet over. Datan finns bara sa lange enheten ar igang.
+static Matning historiken[HISTORIK_LANGD];
+static size_t  histHuvud = 0;
+static size_t  histAntal = 0;
+
+static bool harMatning = false;
+static Matning senaste;
+>>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
 
 // Samma JSON-namn anvands har som i MQTT-meddelandet, sa att bade molnet och
 // den lokala dashboarden laser matdata i exakt samma format.
@@ -51,6 +65,7 @@ static void handleStatus() {
     wifi["rssi"]     = isWiFiConnected() ? WiFi.RSSI() : 0;
 
     JsonObject mqtt = doc["mqtt"].to<JsonObject>();
+<<<<<<< HEAD
     mqtt["ansluten"] = isMQTTConnected();
     mqtt["skickade"] = antalSkickade();
 
@@ -58,6 +73,15 @@ static void handleStatus() {
     buf["antal"]      = bufferAntal();
     buf["kapacitet"]  = bufferKapacitet();
     buf["tappat"]     = bufferHarTappatVarden();
+=======
+    mqtt["ansluten"]    = isMQTTConnected();
+    mqtt["skickade"]    = antalSkickade();
+    mqtt["ej_skickade"] = antalEjSkickade();
+
+    JsonObject lokal = doc["lokal_historik"].to<JsonObject>();
+    lokal["antal"]     = histAntal;
+    lokal["kapacitet"] = (uint32_t)HISTORIK_LANGD;
+>>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
 
     if (harMatning) {
         fyllMatning(doc["senaste"].to<JsonObject>(), senaste);
@@ -66,9 +90,15 @@ static void handleStatus() {
     }
 
     JsonArray hist = doc["historik"].to<JsonArray>();
+<<<<<<< HEAD
     Matning m;
     for (size_t i = 0; i < historikAntal(); i++) {
         if (historikGet(i, m)) fyllMatning(hist.add<JsonObject>(), m);
+=======
+    size_t start = (histHuvud + HISTORIK_LANGD - histAntal) % HISTORIK_LANGD;
+    for (size_t i = 0; i < histAntal; i++) {
+        fyllMatning(hist.add<JsonObject>(), historiken[(start + i) % HISTORIK_LANGD]);
+>>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
     }
 
     String ut;
@@ -94,7 +124,18 @@ void handleLocalServer() {
     server.handleClient();
 }
 
+<<<<<<< HEAD
 void serverSetSenaste(const Matning& m) {
     senaste = m;
     harMatning = true;
 }
+=======
+void serverNyMatning(const Matning& m) {
+    senaste = m;
+    harMatning = true;
+
+    historiken[histHuvud] = m;
+    histHuvud = (histHuvud + 1) % HISTORIK_LANGD;
+    if (histAntal < HISTORIK_LANGD) histAntal++;
+}
+>>>>>>> ba1165bbac4cb8fc0699ba6b99d6a62ee683a961
