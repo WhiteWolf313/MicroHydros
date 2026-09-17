@@ -1,18 +1,57 @@
 #include <Arduino.h>
+#include "Sensors.h"
+#include "Cloud.h"
+#include "LocalServer.h"
+#include "Matning.h"
+#include "config.h"
 
-// put function declarations here:
-int myFunction(int, int);
+static unsigned long sistaMatning = 0;
+static uint32_t seqRaknare = 0;
+
+// Laser alla fyra matpunkter och paketerar dem i en Matning.
+static Matning lasSensorer() {
+    Matning m;
+    m.seq        = ++seqRaknare;
+    m.epoch      = aktuellEpoch();
+    m.uptime_s   = millis() / 1000;
+    m.tempInne   = getAirTempIn();
+    m.fuktInne   = getAirHumidityIn();
+    m.tempUte    = getAirTempOut();
+    m.tempVatten = getWaterTemp();
+    return m;
+}
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+    Serial.begin(115200);
+    delay(1000);
+
+    Serial.println("--- MicroHydros startar ---");
+
+    setupSensors();
+    setupCloud();
+    setupLocalServer();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+    maintainNetwork();      // Wi-Fi: ateranslutning och accesspunkt vid avbrott
+    maintainMQTT();         // broker: ateranslutning utan att blockera loopen
+    handleLocalServer();    // lokal dashboard, fungerar aven helt utan internet
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+    unsigned long nu = millis();
+    if (nu - sistaMatning < MATINTERVALL_MS) return;
+    sistaMatning = nu;
+
+    Matning m = lasSensorer();
+
+    // Den lokala vyn uppdateras ALLTID och forst. Den ar oberoende av
+    // internet och ar darfor systemets tillforlitliga vag ut for matdata.
+    serverNyMatning(m);
+
+    // Molnet ar ett tillagg. Nar brokern inte gar att na hoppas den har
+    // matningen over - inget buffras och inget skickas i efterhand.
+    if (!publiceraMatning(m)) {
+        Serial.print("Ingen kontakt med brokern - matning ");
+        Serial.print(m.seq);
+        Serial.println(" visas bara i den lokala vyn.");
+    }
 }
