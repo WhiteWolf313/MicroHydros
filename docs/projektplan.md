@@ -179,7 +179,7 @@ Mätdata skickas som JSON och innehåller bland annat mätvärden och tidsstämp
 
 Arkitekturdiagrammet finns i:
 
-`docs/arkitektur.png`
+![Arkitekturdiagram](docs/arkitektur.png)
 
 ---
 
