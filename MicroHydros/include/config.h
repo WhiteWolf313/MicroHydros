@@ -8,8 +8,8 @@
 #define DEVICE_ID "microhydros-01"
 
 // --- Wi-Fi (station) ---
-#define WIFI_SSID "wifi-name"
-#define WIFI_PASS "pass"  //
+#define WIFI_SSID "DITT_WIFI_NAMN"
+#define WIFI_PASS "DITT_WIFI_LOSENORD"  //
 #define WIFI_TIMEOUT_MS 15000    // hur lange uppstarten vantar pa Wi-Fi
 #define WIFI_RETRY_MS   20000    // intervall mellan ateranslutningsforsok
 
