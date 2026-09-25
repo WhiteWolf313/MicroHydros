@@ -316,14 +316,15 @@ Projektet sträcker sig över fyra veckor:
 # 10. Riskanalys
 
 | Risk | Sannolikhet | Konsekvens | Åtgärd |
-
-| Sensorn ger orimliga eller felaktiga värden | Medel | Hög   | Kontrollera mätvärden mot rimliga intervall och hantera sensorfel i mjukvaran. |
-| Wi-Fi-anslutningen bryts                    | Hög   | Medel | Systemet ska fortsätta mäta lokalt och automatiskt försöka återansluta. |
-| MQTT-anslutningen bryts                     | Medel | Medel | Kontrollera anslutningen och försök återansluta innan nya data skickas. |
-| Adafruit IO är tillfälligt otillgängligt    | Medel | Medel | Fortsätt mäta lokalt och Mätningar under avbrott tappas för molnet. Ingen buffert, medvetet val. |
-| Felaktig sensorinkoppling                   | Medel | Hög   | Kontrollera kopplingsschema och testa varje sensor separat. |
-| Problem med strömförsörjning                | Låg   | Hög   | Kontrollera strömförsörjning och kablage innan testning. |
-| Tidsstämplar blir fel                       | Låg   | Medel | Kontrollera NTP-synkronisering och tidsformat innan data publiceras. |
+|---|---|---|---|
+| Sensorn ger orimliga eller felaktiga värden | Medel | Hög | Kontrollera mätvärden mot rimliga intervall och hantera sensorfel i mjukvaran. |
+| Wi-Fi-anslutningen bryts | Hög | Medel | Systemet ska fortsätta mäta lokalt och automatiskt försöka återansluta. |
+| MQTT-anslutningen bryts | Medel | Medel | Kontrollera anslutningen och försök återansluta innan nya data skickas. |
+| Adafruit IO är tillfälligt otillgängligt | Medel | Medel | Fortsätt mäta lokalt och återuppta överföringen när kommunikationen fungerar igen. |
+| Fel vid merge i Git | Medel | Medel | Arbeta i separata branches, gör tydliga commits och genomför Code Review vid Pull Requests. |
+| Felaktig sensorinkoppling | Medel | Hög | Kontrollera kopplingsschema och testa varje sensor separat. |
+| Problem med strömförsörjning | Låg | Hög | Kontrollera strömförsörjning och kablage innan testning. |
+| Tidsstämplar blir fel | Låg | Medel | Kontrollera NTP-synkronisering och tidsformat innan data publiceras. |
 
 ---
 
@@ -458,19 +459,17 @@ Informationssäkerhet är en del av projektet eftersom systemet kommunicerar öv
 
 Följande principer används:
 
-| Område            | Lösning |
-
-| Wi-Fi-uppgifter   | Ska inte hårdkodas och publiceras i GitHub. |
-| MQTT-uppgifter    | Ska inte hårdkodas och publiceras i GitHub. |
+| Område | Lösning |
+|---|---|
+| Wi-Fi-uppgifter | Ska inte hårdkodas och publiceras i GitHub. |
+| MQTT-uppgifter | Ska inte hårdkodas och publiceras i GitHub. |
 | Versionshantering | Känsliga uppgifter ska finnas i lokala konfigurationsfiler som inte checkas in. |
-| Kommunikation     | Prototypen använder MQTT utan kryptering (port 1883). Adafruit IO stöder TLS (port 8883), men det är inte implementerat i prototypen. 
-                      Detta är en känd begränsning som bör åtgärdas i  nästa fas med `WiFiClientSecure`. |
-| Autentisering     | MQTT-tjänsten använder autentisering enligt dess konfiguration. |
+| Kommunikation | Säker kommunikation ska användas där det stöds av den valda MQTT-tjänsten. |
+| Autentisering | MQTT-tjänsten använder autentisering enligt dess konfiguration. |
 | Accesspunkt (AP-läge) | Lösenordet (`AP_PASS`) ligger i `config.h` och checkas därför inte in i Git, men det är fast inkompilerat i firmware och samma för alla enheter. I en produkt bör varje enhet få ett unikt lösenord. |
 | Lokal dashboard | Webbservern (`/` och `/api/status`) saknar egen inloggning. Den som är ansluten till samma nätverk eller accesspunkt kan se mätdata, men kan inte styra enheten. Inloggning bör läggas till i nästa fas. |
-| Data              | Systemet skickar endast tekniska mätvärden och tidsstämplar. |
-| Personuppgifter   | Prototypen hanterar inga personuppgifter. |
-| Lokal dashboard   | Webbservern och accesspunkten saknar egen autentisering utöver AP-lösenordet. Dashboarden visar bara mätdata och kan inte styra enheten. |
+| Data | Systemet skickar endast tekniska mätvärden och tidsstämplar. |
+| Personuppgifter | Prototypen hanterar inga personuppgifter. |
 
 Känsliga uppgifter ska hanteras separat från versionshanterad kod. Exempelvis ska lösenord, API-nycklar och andra hemligheter inte läggas direkt i GitHub.
 
@@ -499,17 +498,17 @@ Systemet ska hantera fel på ett kontrollerat sätt.
 
 Grundprincipen är att systemet ska upptäcka och hantera fel i stället för att krascha eller fortsätta skicka uppenbart felaktiga värden.
 
-| Situation                    | Hantering |
-
-| Sensor ger felaktigt värde   | Värdet kontrolleras och flaggas vid behov. |
-| SHT31-D kan inte läsas       | Sensorfelet identifieras och hanteras. |
-| DS18B20 svarar inte          | Mätningen markeras som felaktig. |
-| Orimligt temperaturvärde     | Värdet kontrolleras mot ett rimligt intervall. |
-| Orimlig luftfuktighet        | Värdet kontrolleras mot ett rimligt intervall. |
-| Wi-Fi försvinner             | Systemet fortsätter mäta och försöker återansluta. |
-| MQTT-anslutning försvinner   | Systemet försöker återansluta. |
+| Situation | Hantering |
+|---|---|
+| Sensor ger felaktigt värde | Värdet kontrolleras och flaggas vid behov. |
+| SHT31-D kan inte läsas | Sensorfelet identifieras och hanteras. |
+| DS18B20 svarar inte | Mätningen markeras som felaktig. |
+| Orimligt temperaturvärde | Värdet kontrolleras mot ett rimligt intervall. |
+| Orimlig luftfuktighet | Värdet kontrolleras mot ett rimligt intervall. |
+| Wi-Fi försvinner | Systemet fortsätter mäta och försöker återansluta. |
+| MQTT-anslutning försvinner | Systemet försöker återansluta. |
 | Adafruit IO är otillgängligt | Systemet fortsätter samla in mätdata lokalt och återupptar kommunikationen när anslutningen fungerar igen. |
-| Enheten startas om           | Systemet initierar sensorer och kommunikation igen och återupptar mätning. |
+| Enheten startas om | Systemet initierar sensorer och kommunikation igen och återupptar mätning. |
 
 Tillförlitligheten verifieras genom komponenttester, integrationstester och ett längre stabilitetstest.
 
