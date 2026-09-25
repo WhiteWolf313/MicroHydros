@@ -50,3 +50,17 @@ För att underlätta framtida underhåll, felsökning och vidareutveckling av h�
 * **DS18B20 (Vattensensor)**
   Kapslad och vattentät temperatursensor från Maxim Integrated (numera Analog Devices). Placeras direkt i näringslösningen och kommunicerar med mikrokontrollern via 1-Wire-protokollet.
   [Maxim DS18B20 Datasheet (PDF)](https://www.analog.com/media/en/technical-documentation/data-sheets/ds18b20.pdf)
+
+
+## Kända begränsningar
+
+* **Ingen kryptering:** MQTT skickas okrypterat på port 1883. Adafruit IO stöder TLS (port 8883) men det är inte implementerat.
+* **Ingen buffring mot molnet:** Mätningar som görs under ett nätverksavbrott skickas aldrig i efterhand. De visas bara i den lokala dashboarden.
+* **Lokal historik försvinner vid omstart:** De 20 senaste mätningarna lagras endast i RAM.
+* **Lokal dashboard saknar inloggning:** Alla som är anslutna till samma nätverk eller accesspunkt kan se mätdata (men inte styra enheten).
+* **Enkel rimlighetskontroll:** Värden kontrolleras bara mot fasta intervall. Plötsliga hopp, drift eller trender upptäcks inte.
+* **Ej kalibrerade sensorer:** Sensorerna har inte kalibrerats mot en referenstermometer.
+* **Ej testad i verklig odlingsmiljö:** Prototypen är byggd på kopplingsdäck och har inte testats under längre tid i hög luftfuktighet,
+    där kondens kan  påverka SHT31.
+* **Begränsningar i Adafruit IO (gratisnivå):** max 30 datapunkter per minut och begränsad lagringstid för historik.
+* **En vattensensor:** Koden läser bara den första DS18B20-sensorn på 1-Wire-bussen.
