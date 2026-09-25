@@ -329,14 +329,15 @@ Projektet sträcker sig över fyra veckor:
 
 # 11. Budget och resurser
 
-| Komponent | Antal | Beräknad kostnad |
 
-| ESP32-S3 utvecklingskort            | 1 (+1 reserv) | 220 kr |
-| SHT31-D-modul                       | 2             | 100 kr |
-| DS18B20 vattentät sond              | 1 (+1 reserv) | 150 kr |
-| Motstånd, kopplingsdäck och kablage | –             | 100 kr |
-| USB-C strömförsörjning/kabel        | 1             | 80 kr |
-| **Total kostnad**                                   | **650 kr** |
+| Komponent | Antal | Beräknad kostnad |
+|---|---:|---:|
+| ESP32-S3 utvecklingskort | 1 (+1 reserv) | 220 kr |
+| SHT31-D-modul | 2 | 100 kr |
+| DS18B20 vattentät sond | 1 (+1 reserv) | 150 kr |
+| Motstånd, kopplingsdäck och kablage | – | 100 kr |
+| USB-C strömförsörjning/kabel | 1 | 80 kr |
+| **Total kostnad** | | **650 kr** |
 
 Programvaran som används i projektet är kostnadsfri eller tillgänglig inom projektets förutsättningar.
 
