@@ -16,8 +16,8 @@ För att säkerställa att prototypen av MicroHydros uppfyller kraven från Hydr
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **K01** | Avläsning: SHT31 (Inne/Ute) | Systemet startades i rumstemperatur. En sensor värmdes lätt med handen. | Båda sensorerna initieras på I2C-bussarna (0x44). Handvärmd sensor ska visa ökande temperatur. | Sensor INNE visade 22.1°C / 45% RH. Sensor UTE (värmd) steg till 28.4°C. | Godkänt |
 | **K02** | Avläsning: DS18B20 (Vatten) | Vattensensorn placerades i ett glas med kallt kranvatten. | Sensorn initieras via 1-Wire och visar en temperatur lägre än rumstemperaturen. | Sensorn läste framgångsrikt av 14.3°C. | Godkänt |
-| **K03** | Jämförelse SHT31 inne/ute | Båda sensorerna placerades bredvid varandra i 10 minuter. | Skillnad inom sensorernas noggrannhet (ca ±0,3 °C / ±2 %RH enligt datablad). | *FYLL I* | *FYLL I* |
-| **K04** | Jämförelse mot referens | DS18B20 och SHT31 jämfördes med en referenstermometer. | Skillnad inom ca ±0,5 °C. | *FYLL I* | *FYLL I* |
+| **K03** | Jämförelse SHT31 inne/ute | Båda sensorerna placerades bredvid varandra i 10 minuter. | Skillnad inom sensorernas noggrannhet (ca ±0,3 °C / ±2 %RH enligt datablad). | stämmer | Godkänd |
+| **K04** | Jämförelse mot referens | DS18B20 och SHT31 jämfördes med en referenstermometer. | Skillnad inom ca ±0,5 °C. | 0,4 | Godkänd |
 
 ### 2.2 Integrationstester (Nätverk & Moln)
 
@@ -34,7 +34,7 @@ För att säkerställa att prototypen av MicroHydros uppfyller kraven från Hydr
 | **S01** | Bortkopplad sensor under drift | Datakabeln till DS18B20-sensorn drogs ur under pågående körning. | Systemet ska upptäcka felet, kasta mätningen, och inte skicka skräpdata till molnet. Loopen får inte krascha. | Funktionen returnerade felkoden `-127.0` som filtrerades till `-999.0` (`FEL_VARDE`). Den lokala vyn visade "Ingen avläsning". Inget orimligt värde skickades till Adafruit IO. | Godkänt |
 | **S02** | Nätverksavbrott och Fallback (AP-läge) | Huvudroutern stängdes av under drift. | Enheten misslyckas med MQTT. Efter två Wi-Fi-försök startas den lokala Accesspunkten ("MicroHydros-01"). MQTT-meddelanden hoppas över (ejSkickade ökar). | Accesspunkten dök upp i mobilens Wi-Fi-lista. Den lokala dashboarden nåddes på 192.168.4.1. `ejSkickade` räknade upp, men mätningarna fortgick lokalt. | Godkänt |
 | **S03** | Återställning efter nätverksavbrott | Huvudroutern slogs på igen efter test S02. | Systemet återansluter till Wi-Fi och MQTT automatiskt utan omstart och återupptar publiceringen. | Återanslöt automatiskt efter ca 20 sekunder. Nya mätvärden dök direkt upp på Adafruit IO igen. | Godkänt |
-| **S04** | Långtidsstabilitet | Systemet kördes oavbrutet i *X* timmar. | Inga omstarter, `seq` ökar utan luckor, `ejSkickade` = 0 vid stabilt nätverk. | *FYLL I* | *FYLL I* |
+| **S04** | Långtidsstabilitet | Systemet kördes oavbrutet i *10* timmar. | Inga omstarter, `seq` ökar utan luckor, `ejSkickade` = 0 vid stabilt nätverk. | ingen fel | Godkänd |
 
 ---
 
